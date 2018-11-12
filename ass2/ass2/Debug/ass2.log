@@ -1,0 +1,6 @@
+﻿  main.c
+c:\users\dimazagorodny\source\repos\ass2\ass2\main.c(168): warning C4473: 'scanf_s' : not enough arguments passed for format string
+  c:\users\dimazagorodny\source\repos\ass2\ass2\main.c(168): note: placeholders and their parameters expect 2 variadic arguments, but 1 were provided
+  c:\users\dimazagorodny\source\repos\ass2\ass2\main.c(168): note: the missing variadic argument 2 is required by format string '%c'
+  c:\users\dimazagorodny\source\repos\ass2\ass2\main.c(168): note: this argument is used as a buffer size
+  ass2.vcxproj -> C:\Users\dimazagorodny\source\repos\ass2\Debug\ass2.exe
