@@ -1,10 +1,14 @@
 // C program to evaluate value of a postfix
 // expression having multiple digit operands
+
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <math.h>
+
 
 struct node
 {
@@ -18,6 +22,20 @@ struct stack
 	node * head;
 };
 typedef struct stack t_stack;
+
+int checkOperator(char a, char b) {
+	if (a == '^') {
+		if (a != b) {
+			return 0;
+		}
+	}
+	else if (a == '*' || a == '/') {
+		if (b == '+' || b == '-') {
+			return 0;
+		}
+	}
+	return 1;
+}
 
 t_stack* create()
 {
@@ -84,35 +102,42 @@ int evaluatePostfix(char* exp)
 
 void infixTopostfix(char infix[], char postfix[]) {
 	// CONVERTING FROM INFIX TO POSTFIX
-	char str[] = "";
+	char str[100] = { 0 };
 	t_stack* stack = create();
 	int j = 0;
 	for (int i = 0; infix[i] != '\0'; ++i) {
 		char token = infix[i];
-		printf("infix- %c ", token);
+		char next_token = infix[i + 1];
 		if (token == '(') {
 			push(stack, token);
 		}
 		else if (token == ')') {
 			while (!isEmpty(stack) && peek(stack) != '(') {
 				str[j++] = pop(stack);
+				str[j++] = ' ';
 			}
 			pop(stack);
 		}
 		else if (token == '+' || token == '-' || token == '*' || token == '/' || token == '^') {
-			while (!isEmpty(stack)) {
-
+			while (!isEmpty(stack) && peek(stack) != '(') {
+				if (!checkOperator(peek(stack), token)) {
+					str[j++] = pop(stack);
+					str[j++] = ' ';
+				}
+				else break;
 			}
+			push(stack, token);
 		}
 		else if (token >= '0' && token <= '9') {
 			str[j++] = token;
-		}
-		else {
-			str[j++] = ' ';
+			if (next_token < '0' || next_token > '9') {
+				str[j++] = ' ';
+			}
 		}
 	}
 	while (!isEmpty(stack)) {
 		str[j++] = pop(stack);
+		str[j++] = ' ';
 	}
 
 	for (int i = 0; i < j; ++i) {
@@ -149,7 +174,7 @@ int main()
 		PrintExpDetails(ex[i]);
 
 	char c;
-	scanf_s("%c", &c);
+	scanf("%c", &c);
 
 	return 0;
 }
