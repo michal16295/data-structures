@@ -11,49 +11,55 @@ struct node
     char data;
     struct node* next;
 };
-typedef struct node* node;
+typedef struct node node;
 
-node create(node head)
+struct stack
 {
-    return head = NULL;
+    node * head;
+};
+typedef struct stack t_stack;
+
+t_stack* create()
+{
+    t_stack* stack = malloc(sizeof(t_stack));
+    return stack;
 }
-int isEmpty(node head)
+int isEmpty(t_stack* stack)
 {
-    return head == NULL ? 1 : 0;
+    return stack->head == NULL;
 }
-node push(node head,int element)
+void push(t_stack* stack, char element)
 {
-    if(isEmpty(head)){
-        head = (node)malloc(sizeof(node));
-        head ->data = element;
-        head->next = NULL;
+    node* n = (node*)malloc(sizeof(node));
+    n->data = element;
+    n->next = NULL;
+    if (isEmpty(stack)) {
+        stack->head = n;
+    } else {
+        n->next = stack->head;
+        stack->head = n;
     }
-    else{
-        node temp = (node)malloc(sizeof(node));
-        temp->data = element;
-        temp->next = head;
-        head = temp;
-    }
-    return head;
 }
-node pop(node head)
+char pop(t_stack* stack)
 {
-    if(isEmpty(head)){
+    if(isEmpty(stack)){
         printf("Stack Underflow\n");
-        return NULL;
+        return 0;
     }
     else{
-        node cur = head;
-        head = cur->next;
-        free(cur);
-        return head;
+        char c = stack->head->data;
+        node* n = stack->head;
+        stack->head = stack->head->next;
+        free(n);
+        return c;
     }
 }
-void display(node head)
+void display(t_stack * stack)
 {
-    while(head != NULL){
-        printf("%d->" , head->data);
-        head = head->next;
+    node* temp = stack->head;
+    while(temp != NULL){
+        printf("%d->" , temp->data);
+        temp = temp->next;
     }
     printf("NULL\n");
 }
@@ -65,46 +71,40 @@ int evaluatePostfix(char* exp)
     return 0;
 }
 
-
 void infixTopostfix(char infix[], char postfix[]) {
     // CONVERTING FROM INFIX TO POSTFIX
     char str[100];
-    node stack = NULL;
+    t_stack *stack = create();
     char token;
     int j = 0;
-    stack = create(stack);
     for(int i = 0  ; infix[i] != '\0' ; i++){
         token = infix[i];
         if(token == '('){
-            stack = push(stack,token);
+            push(stack,token);
         }
         else if(token == ')'){
-            while(stack != NULL && stack->data != '('){
-                str[j] = stack->data;
-                stack = pop(stack);
+            char c = pop(stack);
+            while(!isEmpty(stack) && c != '('){
+                str[j] = c;
+                str[++j] = ' ';
+                c = pop(stack);
                 j++;
             }
-            stack = pop(stack);
+            pop(stack);
         }
         else if(token == '+' || token == '-' || token == '*' || token == '/' || token == '^'){
-            while(stack != NULL){
-                if (token == '^' ||
-                    ((token == '*' || token == '/') && (stack->data == '^')) ||
-                    ((token == '+' || token == '-') && (stack->data != '+' || stack->data != '-'))) {
-                    str[j] = stack->data;
-                    stack = pop(stack);
-                    j++;
-                }
-                stack = push(stack, token);
+            while(!isEmpty(stack)){
+                str[j] = pop(stack);
+                str[++j] = ' ';
+                j++;
             }
+            push(stack, token);
         } else if (token >= '0' && token <= '9') {
             str[j++] = token;
         }
     }
     
     for (int i = 0; i < j; ++i) {
-        char c = str[i];
-        c = postfix[i];
         *(postfix + i) = str[i];
     }
     postfix[j] = '\n';
@@ -122,19 +122,14 @@ void PrintExpDetails(char exp[]){
 // Driver program to test the above functions
 int main()
 {
-    node head = NULL;
-    head = create(head);
-    for(int i = 0 ; i < 10 ; i++){
-        head = push(head,i);
+    t_stack* stack = create();
+    for(char i = 1 ; i <= 10 ; i++){
+        push(stack, i);
     }
-    display(head);
-    node head2 = NULL;
-    for(int i = 0 ; i < 5 ; i++){
-        head2 = push(head2 , i);
-    }
-    head = pop(head);
-    head2 = pop(head2);
-    display(head2);
+    display(stack);
+    
+    pop(stack);
+    display(stack);
 
    char ex[][50] = { "10*5-3", "(5-2)*13", "18-3*5", "4*5-2", "(10+3)*2", "20-3*5", "12-12/3", "(7+4)^2",
         "(4*5)^2", "(15-7)-4*(18-30)^2", "(23-2)*2^4" };
