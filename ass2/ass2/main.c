@@ -96,6 +96,10 @@ int getNumberFromStack(t_stack* stack) {
 		if (c == '$') {
 			break;
 		}
+		if (c == '-') {
+			result *= -1;
+			continue;
+		}
 		c -= '0';
 		result = result + c * mul;
 		mul *= 10;
@@ -108,6 +112,10 @@ void convertAndPutInAStack(t_stack* stack, int n) {
 	push(stack, '$');
 	if (n == 0) {
 		push(stack, '0');
+	}
+	if (n < 0) {
+		push(stack, '-');
+		n *= -1;
 	}
 	char buffer[20] = { 0 };
 	int i = 0;
@@ -214,7 +222,6 @@ void infixTopostfix(char infix[], char postfix[]) {
 	for (int i = 0; i < j; ++i) {
 		*(postfix + i) = str[i];
 	}
-	postfix[j] = '\n';
 }
 void PrintExpDetails(char exp[]) {
 	char sol[100] = { 0 };
